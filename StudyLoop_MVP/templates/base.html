@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StudyLoop</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header>
+  <h1><a href="{{ url_for('index') }}">StudyLoop</a></h1>
+  <nav><a href="{{ url_for('index') }}">Home</a> • <a href="{{ url_for('new_post') }}">New Post</a></nav>
+</header>
+{% with messages = get_flashed_messages() %}{% if messages %}
+<ul class="flash">{% for m in messages %}<li>{{ m }}</li>{% endfor %}</ul>{% endif %}{% endwith %}
+<main>{% block content %}{% endblock %}</main>
+<footer><small>Honor Code • Be respectful • Report via button</small></footer>
+</body></html>

@@ -1,0 +1,33 @@
+{% extends "base.html" %}{% block content %}
+<article class="card">
+  <h2>{{ post["title"] }}</h2>
+  <p class="meta">Course: {{ post["course"] }} • Tags: {{ post["tags"] }}</p>
+  <p>{{ post["prompt"] }}</p>
+  {% if ttr is not none %}<p class="meta">Time to first reply: {{ ttr }} minutes</p>{% endif %}
+</article>
+<section><h3>Replies</h3>
+{% for r in replies %}
+<div class="reply">
+  <p><strong>Video:</strong> <a href="{{ r['video_url'] }}" target="_blank">{{ r['video_url'] }}</a></p>
+  <p><strong>Transcript:</strong> {{ r["transcript"] }}</p>
+  <form method="post" action="{{ url_for('rate_reply', reply_id=r['id']) }}" class="inline">
+    <button name="dim" value="clear">Rate: Clear ({{ r['clear'] }})</button>
+    <button name="dim" value="correct">Rate: Correct ({{ r['correct'] }})</button>
+    <button name="dim" value="concise">Rate: Concise ({{ r['concise'] }})</button>
+  </form>
+  <form method="post" action="{{ url_for('report_reply', reply_id=r['id']) }}" class="inline">
+    <button>Report ({{ r['flags'] }})</button>
+  </form>
+  <p class="meta">Q-score: {{ r['qscore'] }}</p>
+</div>
+{% else %}<p>No replies yet — be the first!</p>{% endfor %}
+</section>
+<section class="card">
+  <h3>Add Your 60–90s Reply</h3>
+  <form method="post" action="{{ url_for('add_reply', post_id=post['id']) }}" class="form">
+    <label>Video URL (unlisted)<input type="url" name="video_url" placeholder="https://..." required></label>
+    <label>Transcript (required)<textarea name="transcript" rows="4" required></textarea></label>
+    <button type="submit">Submit Reply</button>
+  </form>
+</section>
+{% endblock %}

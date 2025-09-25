@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% block content %}
+<h2>New Problem Post</h2>
+<form method="post" class="form">
+  <label>Title<input type="text" name="title" required></label>
+  <label>Course<input type="text" name="course" placeholder="Calc I, CS1, Physics I" required></label>
+  <label>Tags (comma-separated)<input type="text" name="tags" placeholder="limits,trig" required></label>
+  <label>Prompt / What are you stuck on?<textarea name="prompt" rows="5" required></textarea></label>
+  <label class="checkbox"><input type="checkbox" name="honor"> I confirm this is my own work and I will cite sources.</label>
+  <button type="submit">Create Post</button>
+</form>
+{% endblock %}
