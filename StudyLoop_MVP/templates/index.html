@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% block content %}
+<h2>Feed</h2>
+<p><em>MVP: newest posts first • Click a post to view or reply.</em></p>
+<div class="feed">
+{% for item in posts %}{% set p = item.row %}
+<article class="card">
+  <h3><a href="{{ url_for('post_detail', post_id=p.id) }}">{{ p["title"] }}</a></h3>
+  <p class="meta">Course: {{ p["course"] }} • Tags: {{ p["tags"] }}
+     • Replies: {{ p["reply_count"] }}{% if item.q_avg %} • Avg Q-score: {{ item.q_avg }}{% endif %}</p>
+  <p class="timestamp">Posted {{ p["created_at"] }}</p>
+</article>
+{% else %}<p>No posts yet.</p>{% endfor %}
+</div>
+{% endblock %}
