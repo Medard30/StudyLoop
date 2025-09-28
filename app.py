@@ -1,7 +1,7 @@
-
 from flask import Flask, render_template, request, redirect, url_for, flash, g
 import sqlite3, os
 from datetime import datetime
+from urllib.parse import urlparse, parse_qs  # <-- for YouTube parsing
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "studyloop.db")
 
@@ -77,10 +77,10 @@ def init_db():
         db.commit()
         cur.execute("""INSERT INTO VideoReply(post_id,video_url,transcript,upvotes,author_id,clear,correct,concise)
                        VALUES (1, ?, ?, 5, 1, 3,3,3)""",
-                    ("https://example.com/unlisted1", "Use series or L'Hôpital: sin x ~ x.",))
+                    ("https://youtu.be/dQw4w9WgXcQ", "Use series or L'Hôpital: sin x ~ x.",))
         cur.execute("""INSERT INTO VideoReply(post_id,video_url,transcript,upvotes,author_id,clear,correct,concise)
                        VALUES (2, ?, ?, 3, 1, 2,2,2)""",
-                    ("https://example.com/unlisted2", "Range issue: use enumerate or check indices.",))
+                    ("https://example.com/clip.mp4", "Range issue: use enumerate or check indices.",))
         db.commit()
 
 def time_to_first_reply(db, post_id):
@@ -95,6 +95,37 @@ def time_to_first_reply(db, post_id):
                         (row["first"], p["created"]))
             return cur.fetchone()[0]
     return None
+
+# --- Video classifier (YouTube / HTML5 / link) ---
+def classify_video(url: str):
+    """
+    Returns {"player": "youtube"|"html5"|"link", "embed": <url or embed-url>}
+    """
+    u = (url or "").strip()
+    if not u:
+        return {"player": "link", "embed": ""}
+
+    lower = u.lower()
+    # YouTube
+    if "youtube.com" in lower or "youtu.be" in lower:
+        try:
+            yt_id = None
+            if "youtu.be/" in lower:
+                yt_id = u.split("youtu.be/")[-1].split("?")[0]
+            else:
+                q = parse_qs(urlparse(u).query)
+                yt_id = (q.get("v") or [None])[0]
+            if yt_id:
+                return {"player": "youtube", "embed": f"https://www.youtube.com/embed/{yt_id}"}
+        except Exception:
+            pass
+        return {"player": "link", "embed": u}
+
+    # HTML5 sources
+    if lower.endswith((".mp4", ".webm", ".ogg", ".ogv")):
+        return {"player": "html5", "embed": u}
+
+    return {"player": "link", "embed": u}
 
 # --- Routes ---
 @app.route("/")
@@ -147,9 +178,22 @@ def post_detail(post_id):
     post = cur.fetchone()
     if not post:
         return ("Not found", 404)
-    cur.execute("""SELECT *, (clear+correct+concise) AS qscore
-                   FROM VideoReply WHERE post_id=? ORDER BY datetime(created_at) DESC""", (post_id,))
-    replies = cur.fetchall()
+
+    cur.execute("""
+        SELECT *, (clear+correct+concise) AS qscore
+        FROM VideoReply
+        WHERE post_id=?
+        ORDER BY datetime(created_at) DESC
+    """, (post_id,))
+    rows = cur.fetchall()
+
+    # Attach player info (youtube/html5/link)
+    replies = []
+    for r in rows:
+        d = dict(r)  # Jinja supports dot access on dict keys
+        d.update(classify_video(d.get("video_url", "")))
+        replies.append(d)
+
     ttr = time_to_first_reply(db, post_id)
     return render_template("post_detail.html", post=post, replies=replies, ttr=ttr)
 
