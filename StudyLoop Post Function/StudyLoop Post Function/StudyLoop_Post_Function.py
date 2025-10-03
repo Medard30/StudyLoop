@@ -1,4 +1,6 @@
 ﻿import sys
+import json
+import os
 from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QLineEdit, QTextEdit, QCheckBox, QLabel
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPainter, QBrush, QPen
@@ -33,21 +35,22 @@ class PostWindow(QWidget):
         }
         """)
 
+        #Possibly won't be used
         #Save Draft Button
-        self.draftButton = QPushButton("Save Draft", self)
-        self.draftButton.setGeometry(200, 740, 100, 40)
-        self.draftButton.setStyleSheet("""
-        QPushButton {
-            background-color: darkblue;
-            color: white;
-        }
-        QPushButton:hover {
-            background-color: #0004ff;
-        }
-        QPushButton:pressed {
-            background-color: gray;
-        }
-        """)
+        #self.draftButton = QPushButton("Save Draft", self)
+        #self.draftButton.setGeometry(200, 740, 100, 40)
+        #self.draftButton.setStyleSheet("""
+        #QPushButton {
+        #    background-color: darkblue;
+        #    color: white;
+        #}
+        #QPushButton:hover {
+        #    background-color: #0004ff;
+        #}
+        #QPushButton:pressed {
+        #    background-color: gray;
+        #}
+        #""")
 
         #Title Textbox
         self.postTitle = QLineEdit(self)
@@ -144,35 +147,49 @@ class PostWindow(QWidget):
         shapeMaker.setPen(QPen(Qt.GlobalColor.black, 1, Qt.PenStyle.SolidLine))
         shapeMaker.setBrush(QBrush(Qt.GlobalColor.lightGray, Qt.BrushStyle.SolidPattern))
         shapeMaker.drawRect(0, 490, 500, 310)
+    
+    #Code to make/write on json file posts made with program
+    def storePost(self, post):
+        filename = "StudyLoopPosts.json"
+        if os.path.exists(filename):
+            with open(filename, "r") as f:
+                try:
+                    posts=json.load(f)
+                except json.JSONDecodeError:
+                    posts = []
+        else:
+            posts = []
+        posts.append(post)
+        with open(filename,"w") as f:
+            json.dump(posts, f, indent=4)
 
-        
     #Code For Checking Contents and Posting
     def handlePost(self):
         if not self.postHoner.isChecked():
             print("You must confirm Honor before posting!")
             return
 
-        title = self.postTitle.text()
-        prompt = self.postPrompt.toPlainText()
-        course = self.postCourse.text()
-        tags = self.postTags.text()
-        URL = self.postURL.text().strip()
+        post = {
+        "title": self.postTitle.text(),
+        "prompt": self.postPrompt.toPlainText(),
+        "course": self.postCourse.text(),
+        "tags": self.postTags.text(),
+        "url": self.postURL.text().strip(),
+        }
 
-        if "youtube.com" in URL or "youtu.be" in URL:
+        if "youtube.com" in post["url"] or "youtu.be" in post["url"]:
             print("YouTube Link")
-        elif "drive.google.com" in URL:
+        elif "drive.google.com" in post["url"]:
             print("Google Drive Link")
         else:
             print("Invalid or Unsupported Link")
             return
 
         #Code for the post being displayed on StudyLoop
-        print("Post submitted!")
-        print("Title:", title)
-        print("Prompt:", prompt)
-        print("Course:", course)
-        print("Tags:", tags)
-        print("URL:", URL)
+        self.storePost(post)
+
+        print("Post Stored")
+        print(post)
 
 
 app = QApplication(sys.argv)
