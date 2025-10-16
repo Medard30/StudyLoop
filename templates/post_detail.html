@@ -1,0 +1,116 @@
+{% extends "base.html" %}{% block content %}
+<article class="card">
+  <h2>{{ post["title"] }}</h2>
+  <p class="meta">Course: {{ post["course"] }} • Tags: {{ post["tags"] }}</p>
+  <p>{{ post["prompt"] }}</p>
+  {% if ttr is not none %}<p class="meta">Time to first reply: {{ ttr }} minutes</p>{% endif %}
+</article>
+
+<section>
+  <h3>Replies</h3>
+
+  {% for r in replies %}
+  <div class="card reply">
+
+    <!-- Embedded video (YouTube / HTML5) with fallback link -->
+    <div class="reply-video" style="margin:.5rem 0 1rem;">
+      {% if r['player'] == 'youtube' %}
+        <iframe width="560" height="315"
+                src="{{ r['embed'] }}"
+                title="YouTube video player" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+      {% elif r['player'] == 'html5' %}
+        <video controls style="max-width:100%;height:auto;">
+          <source src="{{ r['embed'] }}">
+          Your browser does not support the video tag.
+        </video>
+      {% else %}
+        <p><strong>Video:</strong> <a href="{{ r['video_url'] }}" target="_blank" rel="noopener">{{ r['video_url'] }}</a></p>
+      {% endif %}
+    </div>
+
+    <p class="transcript"><strong>Transcript:</strong> {{ r["transcript"] }}</p>
+
+    <p class="meta">
+      Q-score: {{ r['qscore'] or 0 }} • Upvotes: {{ r['upvotes'] }} • Flags: {{ r['flags'] }}
+    </p>
+
+    <form method="post" action="{{ url_for('rate_reply', reply_id=r['id']) }}" class="inline">
+      <button name="dim" value="clear">+ Clear ({{ r['clear'] }})</button>
+      <button name="dim" value="correct">+ Correct ({{ r['correct'] }})</button>
+      <button name="dim" value="concise">+ Concise ({{ r['concise'] }})</button>
+    </form>
+
+    <form method="post" action="{{ url_for('report_reply', reply_id=r['id']) }}" class="inline">
+      <button class="danger">Report ({{ r['flags'] }})</button>
+    </form>
+  </div>
+  {% else %}
+    <p>No replies yet — be the first!</p>
+  {% endfor %}
+</section>
+
+<section class="card">
+  <h3>Add Your 60–90s Reply</h3>
+
+  <!-- Live preview renders here as the user types a URL -->
+  <div id="reply-preview" style="margin:.5rem 0;"></div>
+
+  <form method="post" action="{{ url_for('add_reply', post_id=post['id']) }}" class="form">
+    <label>Video URL (unlisted)
+      <input type="url" name="video_url" id="video_url" placeholder="https://youtu.be/... or https://.../clip.mp4" required>
+    </label>
+    <label>Transcript (required)
+      <textarea name="transcript" rows="4" required></textarea>
+    </label>
+    <button type="submit">Submit Reply</button>
+  </form>
+</section>
+
+<!-- Live preview script -->
+<script>
+(function () {
+  const input = document.getElementById('video_url');
+  const preview = document.getElementById('reply-preview');
+
+  function ytId(u){
+    try {
+      const url = new URL(u);
+      if (url.hostname.includes('youtu.be')) return url.pathname.slice(1).split(/[?&]/)[0];
+      if (url.hostname.includes('youtube.com')) return url.searchParams.get('v');
+    } catch(e) {}
+    return null;
+  }
+
+  function render() {
+    const u = (input.value || '').trim();
+    let html = '';
+    if (!u) { preview.innerHTML=''; return; }
+
+    if (/youtu\.be|youtube\.com/i.test(u)) {
+      const id = ytId(u);
+      html = id
+        ? `<iframe width="560" height="315" src="https://www.youtube.com/embed/${id}"
+             frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+             allowfullscreen></iframe>`
+        : `<a href="${u}" target="_blank" rel="noopener">Open video</a>`;
+    } else if (/\.(mp4|webm|ogg|ogv)$/i.test(u)) {
+      html = `<video controls style="max-width:100%;height:auto;">
+                <source src="${u}">
+              </video>`;
+    } else {
+      html = `<a href="${u}" target="_blank" rel="noopener">Open video</a>`;
+    }
+
+    preview.innerHTML = html;
+  }
+
+  if (input) {
+    input.addEventListener('input', render);
+    render(); // initial on page load
+  }
+})();
+</script>
+
+{% endblock %}
