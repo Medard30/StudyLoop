@@ -12,10 +12,11 @@ Core Features
 3.	Reply System: Add video responses with required transcripts
 4.	Rating System: Rate replies on three criteria (Clear, Correct, Concise)
 5.	Reporting: Flag inappropriate content
-6.	Form Validation: Preserves user input on validation errors
-7.	Backend: Flask 3.x
-8.	Database: SQLite
-9.	Database Access: Flask.g context + teardown handlers
+6.	Search functionality
+7.	Form Validation: Preserves user input on validation errors
+8.	Backend: Flask 3.x
+9.	Database: SQLite
+10.	Database Access: Flask.g context + teardown handlers
 
 Prerequisites:
 Python 3.10 or higher
