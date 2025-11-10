@@ -83,6 +83,7 @@ QA Testing Checklist
     -	 New post appears in feed
 
 4. Post Detail Testing
+Post detail data is stored in the studyloop.db file of StudyLoop, videos are stored in the "uploads" folder
   -	 Clicking post title navigates to detail page
   -	 Post details display correctly:
   -	 Title
