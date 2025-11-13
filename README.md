@@ -142,5 +142,9 @@ Test on multiple browsers:
   -	 Honor Code enforcement works
   -	 CSRF protection (if implemented)
 
+## Known Issues (MVP Scope)
+-   **Reply System Limitation:** The application is **URL-ONLY**; direct video file upload is intentionally out of scope for the MVP. **Fixed**
+-   **Authentication Limitation:** Multi-vote and report prevention uses Flask sessions, not a full user login system. Clearing browser cookies will reset the vote lock. **Fixed**
+
 MVP Scope
 This is a Week 8 MVP with intentionally limited features for demonstration purposes.
