@@ -1,0 +1,25 @@
+Team: Group 2 — StudyLoop
+Members: Wilfried • James • Medard • Elijah
+Week 5 Submitter: Wilfried
+
+Deliverable: MVP (Flask + SQLite)
+Features:
+• Home feed (seeded posts)
+• New Post (Title, Course, Tags, Prompt, Honor Code)
+• Post Detail + Reply (video URL + required transcript)
+• Rate (Clear/Correct/Concise → Q-score) + Report (flags)
+• DB: Flask 3.x-safe (flask.g + teardown); preserves form values on validation error
+• Embedded player (YouTube/HTML5) + live preview on reply form
+
+Run (Windows):
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+python app.py
+# open http://127.0.0.1:5000
+
+GitHub PR: https://github.com/Medard30/StudyLoop/pull/5
+
+Notes:
+• Seed data creates two example posts for a quick demo
+• Video uploads are out of scope for MVP (URL only)
