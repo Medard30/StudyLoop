@@ -66,6 +66,7 @@ QA Testing Checklist
   -	 Post titles are visible and clickable
   -	 Course tags are displayed
   -	 Navigation elements work correctly
+  -	 Filter Bar Responsivness to different sized systems
 
 3. Create Post Testing
   -	 "New Post" page loads
@@ -122,6 +123,7 @@ Post detail data is stored in the studyloop.db file of StudyLoop, videos are sto
   -	 Report submission works
   -	 Report flags are recorded
   -	 Inappropriate content flagging works
+  -	 Report Confrimation 
 
 8. Database Integrity Testing
   -	 Data persists across application restarts
@@ -135,6 +137,7 @@ Test on multiple browsers:
   -	 Firefox
   -	 Safari (macOS)
   -	 Edge
+  -	 Mobile View Consistency
 
 10. Security Testing
   -	 SQL injection attempts are handled safely
@@ -145,6 +148,6 @@ Test on multiple browsers:
 ## Known Issues (MVP Scope)
 -   **Reply System Limitation:** The application is **URL-ONLY**; direct video file upload is intentionally out of scope for the MVP. **Fixed**
 -   **Authentication Limitation:** Multi-vote and report prevention uses Flask sessions, not a full user login system. Clearing browser cookies will reset the vote lock. **Fixed**
-
+-   **Feature Limitation (Roadmap items)**: Basic features like pagination, true user identity tracking, and a dedicated inbox/DM system are planned for the future roadmap but are not implemented in this version.
 MVP Scope
 This is a Week 8 MVP with intentionally limited features for demonstration purposes.
