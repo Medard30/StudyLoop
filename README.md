@@ -23,7 +23,7 @@ Python 3.10 or higher
 Pip python package installer
 Step-by-Step Installation
 1.	Download the Project
-git clone https://github.com/Medard30/StudyLoop.git cd StudyLoop
+git clone https://github.com/Medard30/StudyLoop.git
 2 .  Create Virtual Environment
   a)	Windows:
   •	bashpython -m venv .venv
